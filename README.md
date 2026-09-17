@@ -1,2 +1,0 @@
-# Niemiec
-Niemiecki
