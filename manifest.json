@@ -1,0 +1,22 @@
+{
+  "name": "Niemiecki Trener",
+  "short_name": "Niemiecki",
+  "description": "Aplikacja do nauki języka niemieckiego: czasownik wissen, pory dnia, obowiązki domowe.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#131f24",
+  "theme_color": "#58cc02",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

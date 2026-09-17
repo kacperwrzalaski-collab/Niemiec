@@ -1,0 +1,2044 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Niemiecki Trener</title>
+  
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#58cc02">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <style>
+    :root {
+      --primary: #58cc02;
+      --primary-border: #46a302;
+      --secondary: #1cb0f6;
+      --secondary-border: #1480b3;
+      --accent-boss: #ffc800;
+      --accent-boss-border: #e5a400;
+      --error: #ff4b4b;
+      --error-border: #ea2b2b;
+      --fire: #ff9600;
+      --purple: #ce82ff;
+      --bg: #f7f7f7;
+      --card-bg: #ffffff;
+      --text: #3c3c3c;
+      --subtext: #777777;
+      --border-gray: #e5e5e5;
+      --btn-hover: #f1f1f1;
+      --selected-bg: #ddf4ff;
+      --selected-border: #84d8ff;
+      --selected-bottom: #1cb0f6;
+      --selected-text: #0c7eb6;
+      --correct-bg: #d7ffb8;
+      --correct-border: #58cc02;
+      --correct-bottom: #46a302;
+      --correct-text: #2b6100;
+      --wrong-bg: #ffdfe0;
+      --wrong-border: #ff4b4b;
+      --wrong-bottom: #ea2b2b;
+      --wrong-text: #ea2b2b;
+      --modal-overlay: rgba(0, 0, 0, 0.5);
+      --table-header: #f0f0f0;
+      --example-box-bg: #f9fbfd;
+      --example-border: #dbeafe;
+    }
+
+    body.dark-mode {
+      --bg: #131f24;
+      --card-bg: #202f36;
+      --text: #ffffff;
+      --subtext: #a5b4bc;
+      --border-gray: #37464f;
+      --btn-hover: #2a3c44;
+      --selected-bg: #193848;
+      --selected-border: #1cb0f6;
+      --selected-bottom: #1480b3;
+      --selected-text: #48c9ff;
+      --correct-bg: #1c3b1e;
+      --correct-border: #58cc02;
+      --correct-bottom: #46a302;
+      --correct-text: #79e622;
+      --wrong-bg: #401b1f;
+      --wrong-border: #ff4b4b;
+      --wrong-bottom: #ea2b2b;
+      --wrong-text: #ff7878;
+      --modal-overlay: rgba(0, 0, 0, 0.75);
+      --table-header: #293d47;
+      --example-box-bg: #16242c;
+      --example-border: #233a46;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 0;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    .app-viewport {
+      width: 100%;
+      max-width: 480px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+      position: relative;
+      padding-bottom: 74px;
+    }
+
+    .top-navbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: var(--card-bg);
+      border-bottom: 2px solid var(--border-gray);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      gap: 8px;
+    }
+
+    .top-left-stats {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .stat-pill {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      user-select: none;
+    }
+
+    .stat-pill.fire {
+      color: var(--fire);
+    }
+
+    .stat-pill.elo {
+      color: var(--purple);
+      background: rgba(206, 130, 255, 0.12);
+      padding: 4px 8px;
+      border-radius: 8px;
+      border: 1px solid rgba(206, 130, 255, 0.3);
+    }
+
+    .stat-pill.rank {
+      color: var(--secondary);
+      font-weight: 900;
+      font-size: 0.95rem;
+      letter-spacing: 0.3px;
+    }
+
+    .icon-gear-btn {
+      background: none;
+      border: none;
+      font-size: 1.25rem;
+      cursor: pointer;
+      color: var(--subtext);
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      transition: background 0.15s;
+    }
+
+    .icon-gear-btn:hover {
+      background: var(--btn-hover);
+    }
+
+    .screen-content {
+      padding: 20px 16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .path-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+      padding: 30px 10px;
+      position: relative;
+    }
+
+    .path-connector {
+      position: absolute;
+      width: 6px;
+      background: var(--border-gray);
+      top: 60px;
+      bottom: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1;
+      border-radius: 3px;
+    }
+
+    .path-step-node {
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 8px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      outline: none;
+      width: 100%;
+      max-width: 280px;
+      transition: transform 0.1s;
+    }
+
+    .path-step-node:active {
+      transform: translateY(3px);
+    }
+
+    .node-circle-btn {
+      width: 82px;
+      height: 82px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      color: #fff;
+      position: relative;
+      box-shadow: 0 6px 0 rgba(0,0,0,0.15);
+      transition: all 0.15s;
+    }
+
+    .node-circle-btn.study {
+      background: var(--secondary);
+      border-bottom: 6px solid var(--secondary-border);
+    }
+
+    .node-circle-btn.quiz {
+      background: var(--primary);
+      border-bottom: 6px solid var(--primary-border);
+    }
+
+    .node-circle-btn.boss {
+      background: var(--accent-boss);
+      border-bottom: 6px solid var(--accent-boss-border);
+      width: 96px;
+      height: 96px;
+      font-size: 2.8rem;
+    }
+
+    .node-title-badge {
+      background: var(--card-bg);
+      border: 2px solid var(--border-gray);
+      padding: 6px 14px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: var(--text);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .node-subtext {
+      font-size: 0.8rem;
+      color: var(--subtext);
+      font-weight: 600;
+    }
+
+    .topic-selection-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .topic-select-card {
+      background: var(--card-bg);
+      border: 2px solid var(--border-gray);
+      border-bottom: 4px solid var(--border-gray);
+      border-radius: 16px;
+      padding: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      transition: all 0.15s;
+    }
+
+    .topic-select-card:hover {
+      background: var(--btn-hover);
+    }
+
+    .topic-select-card:active {
+      transform: translateY(2px);
+      border-bottom-width: 2px;
+    }
+
+    .topic-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .topic-desc {
+      font-size: 0.85rem;
+      color: var(--subtext);
+    }
+
+    .bottom-navbar {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      height: 68px;
+      background: var(--card-bg);
+      border-top: 2px solid var(--border-gray);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      z-index: 50;
+      padding: 0 8px;
+    }
+
+    .nav-tab-btn {
+      flex: 1;
+      height: 100%;
+      background: none;
+      border: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--subtext);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .nav-tab-btn .nav-icon {
+      font-size: 1.4rem;
+    }
+
+    .nav-tab-btn.active {
+      color: var(--primary);
+    }
+
+    .nav-tab-btn:active {
+      transform: scale(0.95);
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 2px solid var(--border-gray);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      position: relative;
+      transition: background-color 0.2s, border-color 0.2s;
+    }
+
+    .tag {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      font-weight: 800;
+      color: var(--subtext);
+      letter-spacing: 0.8px;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    .prompt-text {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      text-align: center;
+      line-height: 1.35;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .option-btn {
+      background-color: var(--card-bg);
+      border: 2px solid var(--border-gray);
+      border-bottom: 4px solid var(--border-gray);
+      border-radius: 14px;
+      padding: 14px 18px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+      color: var(--text);
+      transition: all 0.1s;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--btn-hover);
+    }
+
+    .option-btn:active:not(:disabled) {
+      transform: translateY(2px);
+      border-bottom-width: 2px;
+    }
+
+    .option-btn.selected {
+      border-color: var(--selected-border);
+      background-color: var(--selected-bg);
+      border-bottom-color: var(--selected-bottom);
+      color: var(--selected-text);
+    }
+
+    .option-btn.correct {
+      background-color: var(--correct-bg);
+      border-color: var(--correct-border);
+      border-bottom-color: var(--correct-bottom);
+      color: var(--correct-text);
+    }
+
+    .option-btn.wrong {
+      background-color: var(--wrong-bg);
+      border-color: var(--wrong-border);
+      border-bottom-color: var(--wrong-bottom);
+      color: var(--wrong-text);
+    }
+
+    .action-btn {
+      width: 100%;
+      background-color: var(--primary);
+      border: none;
+      border-bottom: 4px solid var(--primary-border);
+      border-radius: 14px;
+      color: white;
+      font-size: 1.05rem;
+      font-weight: 800;
+      padding: 14px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.1s;
+    }
+
+    .action-btn:disabled {
+      background-color: var(--border-gray);
+      border-bottom-color: #555;
+      color: var(--subtext);
+      cursor: not-allowed;
+    }
+
+    .action-btn:active:not(:disabled) {
+      transform: translateY(2px);
+      border-bottom-width: 2px;
+    }
+
+    .action-btn.secondary {
+      background-color: var(--secondary);
+      border-bottom-color: var(--secondary-border);
+    }
+
+    .feedback-box {
+      border-radius: 14px;
+      padding: 12px 16px;
+      display: none;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .feedback-box.correct {
+      display: block;
+      background-color: var(--correct-bg);
+      color: var(--correct-text);
+    }
+
+    .feedback-box.wrong {
+      display: block;
+      background-color: var(--wrong-bg);
+      color: var(--wrong-text);
+    }
+
+    .reading-content {
+      line-height: 1.6;
+      font-size: 0.95rem;
+    }
+
+    .reading-content h3 {
+      font-size: 1.2rem;
+      margin: 16px 0 8px 0;
+      color: var(--primary);
+    }
+
+    .reading-content h3:first-child {
+      margin-top: 0;
+    }
+
+    .reading-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .reading-content th, .reading-content td {
+      border: 1px solid var(--border-gray);
+      padding: 8px 10px;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    .reading-content th {
+      background-color: var(--table-header);
+      font-weight: 700;
+    }
+
+    .reading-content .highlight {
+      font-weight: 700;
+      color: var(--secondary);
+    }
+
+    .examples-container {
+      background: var(--example-box-bg);
+      border: 1px solid var(--example-border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin: 12px 0;
+    }
+
+    .example-item {
+      margin-bottom: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed var(--border-gray);
+    }
+
+    .example-item:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .example-de {
+      font-weight: 700;
+    }
+
+    .example-pl {
+      color: var(--subtext);
+      font-size: 0.85rem;
+    }
+
+    .end-screen {
+      display: none;
+      text-align: center;
+      padding: 30px 16px;
+      background: var(--card-bg);
+      border-radius: 16px;
+      border: 2px solid var(--border-gray);
+    }
+
+    .score-circle-wrapper {
+      margin: 16px auto;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 8px solid var(--primary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .score-percent-val {
+      font-size: 2rem;
+      font-weight: 900;
+    }
+
+    .score-label {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--subtext);
+      text-transform: uppercase;
+    }
+
+    .elo-gain-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(206, 130, 255, 0.15);
+      border: 2px solid var(--purple);
+      color: var(--purple);
+      padding: 8px 16px;
+      border-radius: 14px;
+      font-weight: 800;
+      font-size: 1.05rem;
+      margin: 14px 0;
+    }
+
+    .stats-card-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .stat-box {
+      background: var(--card-bg);
+      border: 2px solid var(--border-gray);
+      border-radius: 14px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .stat-box-val {
+      font-size: 1.4rem;
+      font-weight: 900;
+      margin-bottom: 2px;
+    }
+
+    .stat-box-label {
+      font-size: 0.75rem;
+      color: var(--subtext);
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .achievement-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: var(--card-bg);
+      border: 2px solid var(--border-gray);
+      border-radius: 14px;
+      margin-bottom: 10px;
+    }
+
+    .achievement-icon {
+      font-size: 1.8rem;
+    }
+
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: var(--modal-overlay);
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      padding: 16px;
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      border-radius: 16px;
+      border: 2px solid var(--border-gray);
+      width: 100%;
+      max-width: 440px;
+      padding: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--subtext);
+    }
+
+    .setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-gray);
+    }
+
+    .setting-row:last-child {
+      border-bottom: none;
+    }
+
+    .setting-label {
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-viewport">
+  <header class="top-navbar">
+    <div class="top-left-stats">
+      <div class="stat-pill fire" title="Dzienna passa">
+        <span>🔥</span> <span id="nav-streak">0</span>
+      </div>
+      <div class="stat-pill elo" title="Twój ranking ELO">
+        <span>⚡ ELO:</span> <span id="nav-elo">1000</span>
+      </div>
+    </div>
+    
+    <div class="stat-pill rank" id="nav-rank-badge" title="Ranga">
+      Brąz I
+    </div>
+
+    <button id="settings-open-btn" class="icon-gear-btn" title="Ustawienia">⚙</button>
+  </header>
+
+  <main id="view-game" class="screen-content">
+    <div class="path-container">
+      <div class="path-connector"></div>
+
+      <button class="path-step-node" onclick="openCategorySelector('study')">
+        <div class="node-circle-btn study">📖</div>
+        <div class="node-title-badge">Nauka i Fiszki</div>
+        <div class="node-subtext">Wybierz temat do przeczytania</div>
+      </button>
+
+      <button class="path-step-node" onclick="openCategorySelector('quiz')">
+        <div class="node-circle-btn quiz">🎯</div>
+        <div class="node-title-badge">Ćwiczenia (25 pytań)</div>
+        <div class="node-subtext">Wymieszane odpowiedzi, punkty ELO</div>
+      </button>
+
+      <button class="path-step-node" onclick="startBossTest()">
+        <div class="node-circle-btn boss">👑</div>
+        <div class="node-title-badge" style="border-color: var(--accent-boss);">Test Całościowy (BOSS)</div>
+        <div class="node-subtext">Wszystkie 75 pytań naraz!</div>
+      </button>
+    </div>
+  </main>
+
+  <section id="view-topic-picker" class="screen-content" style="display: none;">
+    <h2 id="picker-title" style="font-size: 1.4rem; font-weight: 800; margin-bottom: 4px;">Wybierz temat</h2>
+    <p id="picker-subtitle" style="font-size: 0.9rem; color: var(--subtext); margin-bottom: 16px;">Każdy dział zawiera 25 zróżnicowanych zadań</p>
+
+    <div class="topic-selection-list">
+      <div class="topic-select-card" onclick="selectTopicAndProceed('wissen')">
+        <div>
+          <div class="topic-title">1. Czasownik „wissen”</div>
+          <div class="topic-desc">25 pytań: odmiana przez osoby, proste zdania</div>
+        </div>
+        <span style="font-size: 1.2rem;">➔</span>
+      </div>
+
+      <div class="topic-select-card" onclick="selectTopicAndProceed('time')">
+        <div>
+          <div class="topic-title">2. Pory dnia i obowiązki domowe</div>
+          <div class="topic-desc">25 pytań: pory dnia, reguła 'am', 'in der Nacht', sprzątanie</div>
+        </div>
+        <span style="font-size: 1.2rem;">➔</span>
+      </div>
+
+      <div class="topic-select-card" onclick="selectTopicAndProceed('time_sentences')">
+        <div>
+          <div class="topic-title">3. Oś czasu i zwroty złożone</div>
+          <div class="topic-desc">25 pytań: heute, morgen, gestern, vorgestern, übermorgen</div>
+        </div>
+        <span style="font-size: 1.2rem;">➔</span>
+      </div>
+    </div>
+
+    <button class="action-btn" style="margin-top: 24px;" onclick="switchTab('game')">◀ Wróć do ścieżki</button>
+  </section>
+
+  <section id="view-study" class="screen-content" style="display: none;">
+    <div class="card">
+      <div id="study-tag" class="tag">Baza wiedzy</div>
+      <div id="study-content" class="reading-content"></div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 10px; margin-top: auto;">
+      <button id="study-to-quiz-btn" class="action-btn">Przejdź do ćwiczeń z tego tematu</button>
+      <button class="action-btn secondary" onclick="switchTab('knowledge')">Wróć do wyboru tematów</button>
+    </div>
+  </section>
+
+  <section id="view-quiz" class="screen-content" style="display: none;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+      <div id="quiz-hearts" class="stat-pill" style="color: var(--error); font-size: 1.1rem;">
+        <span>❤</span> <span id="hearts-count">3</span>
+      </div>
+      <div id="quiz-timer" style="font-weight: 800; font-size: 0.95rem; color: var(--subtext);">
+        ⏱ <span id="question-time">0</span>s
+      </div>
+    </div>
+
+    <div class="card">
+      <div id="quiz-category-tag" class="tag">Ćwiczenie</div>
+      <div id="prompt-text" class="prompt-text">Treść zadania</div>
+    </div>
+
+    <div id="options-container" class="options-grid"></div>
+
+    <div style="margin-top: auto;">
+      <div id="feedback" class="feedback-box"></div>
+      <button id="submit-btn" class="action-btn" disabled>Sprawdź</button>
+    </div>
+  </section>
+
+  <section id="view-end" class="screen-content" style="display: none;">
+    <div class="end-screen" style="display: block;">
+      <h2 id="end-title" style="font-size: 1.6rem; font-weight: 900; margin-bottom: 4px;">Ukończono quest!</h2>
+      <p id="end-subtitle" style="font-size: 0.95rem; color: var(--subtext);">Oto Twoje wyniki:</p>
+
+      <div class="score-circle-wrapper" id="end-circle">
+        <div class="score-percent-val" id="end-percent">100%</div>
+        <div class="score-label">Dokładność</div>
+      </div>
+
+      <div class="elo-gain-pill">
+        <span>⚡ Zmiana ELO:</span> <span id="end-elo-diff">+25</span>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 16px;">
+        <button class="action-btn" onclick="switchTab('game')">Kontynuuj ścieżkę</button>
+        <button class="action-btn secondary" onclick="restartCurrentQuiz()">Zagraj ponownie</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-stats" class="screen-content" style="display: none;">
+    <h2 style="font-size: 1.4rem; font-weight: 900; margin-bottom: 14px;">Twoje Statystyki i Ranga</h2>
+
+    <div class="stats-card-grid">
+      <div class="stat-box">
+        <div class="stat-box-val" id="stat-elo-val" style="color: var(--purple);">1000</div>
+        <div class="stat-box-label">Ranking ELO</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-val" id="stat-rank-val" style="color: var(--secondary);">Brąz I</div>
+        <div class="stat-box-label">Ranga</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-val" id="stat-streak-val" style="color: var(--fire);">0</div>
+        <div class="stat-box-label">Passa Dni</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-val" id="stat-total-answers">0</div>
+        <div class="stat-box-label">Odpowiedzi</div>
+      </div>
+    </div>
+
+    <h3 style="font-size: 1.1rem; font-weight: 800; margin: 16px 0 10px 0;">Osiągnięcia</h3>
+    <div class="achievement-item">
+      <div class="achievement-icon">🔥</div>
+      <div>
+        <div style="font-weight: 800; font-size: 0.95rem;">W ogniu nauki</div>
+        <div style="font-size: 0.8rem; color: var(--subtext);">Utrzymaj passę przez minimum 3 dni.</div>
+      </div>
+    </div>
+    <div class="achievement-item">
+      <div class="achievement-icon">⚡</div>
+      <div>
+        <div style="font-weight: 800; font-size: 0.95rem;">Mistrz Szybkości (ELO 1100+)</div>
+        <div style="font-size: 0.8rem; color: var(--subtext);">Osiągnij rangę Srebro dzięki poprawności i refleksowi.</div>
+      </div>
+    </div>
+    <div class="achievement-item">
+      <div class="achievement-icon">👑</div>
+      <div>
+        <div style="font-weight: 800; font-size: 0.95rem;">Pogromca Bossa</div>
+        <div style="font-size: 0.8rem; color: var(--subtext);">Ukończ całościowy test 75 pytań.</div>
+      </div>
+    </div>
+  </section>
+
+  <nav class="bottom-navbar">
+    <button class="nav-tab-btn active" id="tab-game" onclick="switchTab('game')">
+      <span class="nav-icon">🎯</span>
+      <span>Trening</span>
+    </button>
+    <button class="nav-tab-btn" id="tab-knowledge" onclick="switchTab('knowledge')">
+      <span class="nav-icon">📖</span>
+      <span>Kącik wiedzy</span>
+    </button>
+    <button class="nav-tab-btn" id="tab-stats" onclick="switchTab('stats')">
+      <span class="nav-icon">🏆</span>
+      <span>Osiągnięcia</span>
+    </button>
+  </nav>
+</div>
+
+<div id="settings-modal" class="modal-backdrop">
+  <div class="modal-content">
+    <div class="modal-header">
+      <div class="modal-title">Ustawienia</div>
+      <button id="settings-close-btn" class="close-btn">&times;</button>
+    </div>
+
+    <div class="setting-row">
+      <label class="setting-label" for="setting-darkmode">Ciemny motyw</label>
+      <input type="checkbox" id="setting-darkmode">
+    </div>
+
+    <button id="settings-save-btn" class="action-btn" style="margin-top: 16px;">Zapisz</button>
+  </div>
+</div>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('SW zarejestrowany', reg))
+      .catch(err => console.log('Błąd SW', err));
+  });
+}
+
+const studyDatabases = {
+  "wissen": {
+    "title": "Czasownik „wissen” (wiedzieć)",
+    "html": "\n      <h3>Odmiana czasownika „wissen”</h3>\n      <p>Czasownik <strong>wissen</strong> jest nieregularny:</p>\n      <ul>\n        <li>Dla <strong>ich</strong> oraz <strong>er/sie/es</strong> rdzeń zmienia się na <strong>weiß</strong> i <em>nie ma żadnej końcówki</em>!</li>\n        <li>Dla <strong>du</strong> dodajemy tylko -t: <strong>weißt</strong>.</li>\n        <li>Liczba mnoga odmienia się regularnie: <strong>wir wissen</strong>, <strong>ihr wisst</strong>, <strong>sie/Sie wissen</strong>.</li>\n      </ul>\n      <table>\n        <thead><tr><th>Osoba</th><th>Niemiecki</th><th>Polski</th></tr></thead>\n        <tbody>\n          <tr><td>ich</td><td><strong>weiß</strong></td><td>ja wiem</td></tr>\n          <tr><td>du</td><td><strong>weißt</strong></td><td>ty wiesz</td></tr>\n          <tr><td>er/sie/es</td><td><strong>weiß</strong></td><td>on/ona/ono wie</td></tr>\n          <tr><td>wir</td><td><strong>wissen</strong></td><td>my wiemy</td></tr>\n          <tr><td>ihr</td><td><strong>wisst</strong></td><td>wy wiecie</td></tr>\n          <tr><td>sie/Sie</td><td><strong>wissen</strong></td><td>oni wiedzą / Pan, Pani wie</td></tr>\n        </tbody>\n      </table>\n      <div class=\"examples-container\">\n        <div class=\"example-item\"><div class=\"example-de\">Ich weiß das nicht.</div><div class=\"example-pl\">Nie wiem tego.</div></div>\n        <div class=\"example-item\"><div class=\"example-de\">Weißt du die Antwort?</div><div class=\"example-pl\">Znasz (wiesz) odpowiedź?</div></div>\n        <div class=\"example-item\"><div class=\"example-de\">Er weiß den Weg.</div><div class=\"example-pl\">On wie, jaka to droga.</div></div>\n      </div>\n    "
+  },
+  "time": {
+    "title": "Pory dnia i obowiązki domowe",
+    "html": "\n      <h3>Pory dnia i zasada „am”</h3>\n      <p>Pory dnia łączą się ze zrostem <strong>am</strong> (an + dem):</p>\n      <ul>\n        <li><strong>am Morgen</strong> – rano</li>\n        <li><strong>am Vormittag</strong> – przed południem</li>\n        <li><strong>am Mittag</strong> – w południe</li>\n        <li><strong>am Nachmittag</strong> – po południu</li>\n        <li><strong>am Abend</strong> – wieczorem</li>\n      </ul>\n      <p><strong>Wyjątek:</strong> <span class=\"highlight\">in der Nacht</span> (w nocy), bo to rodzaj żeński (die Nacht).</p>\n      <div class=\"examples-container\">\n        <div class=\"example-item\"><div class=\"example-de\">Am Morgen mache ich das Bett.</div><div class=\"example-pl\">Rano ścielę łóżko.</div></div>\n        <div class=\"example-item\"><div class=\"example-de\">Am Vormittag sauge ich Staub.</div><div class=\"example-pl\">Przed południem odkurzam.</div></div>\n        <div class=\"example-item\"><div class=\"example-de\">Am Abend bringe ich den Müll raus.</div><div class=\"example-pl\">Wieczorem wynoszę śmieci.</div></div>\n      </div>\n    "
+  },
+  "time_sentences": {
+    "title": "Oś czasu i zwroty złożone",
+    "html": "\n      <h3>Oś czasu (Dni)</h3>\n      <p><strong>vorgestern</strong> (przedwczoraj) ➔ <strong>gestern</strong> (wczoraj) ➔ <strong>heute</strong> (dzisiaj) ➔ <strong>morgen</strong> (jutro) ➔ <strong>übermorgen</strong> (pojutrze).</p>\n      <h3>Łączenie z porami dnia</h3>\n      <p>Drugi człon piszemy wielką literą: <strong>heute Morgen</strong>, <strong>gestern Abend</strong>, <strong>übermorgen Nachmittag</strong>.</p>\n      <p><strong>Wyjątek:</strong> Zamiast powtarzać <em>morgen Morgen</em>, mówimy: <span class=\"highlight\">morgen früh</span> (jutro rano).</p>\n      <h3>Przysłówki z końcówką -s (czynności stałe)</h3>\n      <p><strong>morgens</strong> (rankami), <strong>abends</strong> (wieczorami), <strong>nachts</strong> (nocami).</p>\n    "
+  }
+};
+
+const questionDatabases = {
+  wissen: [
+    {
+        "prompt": "Uzupełnij: Ich _____ das nicht.",
+        "options": [
+            "wissen",
+            "wisse",
+            "weiß",
+            "weißt"
+        ],
+        "answer": 2
+    },
+    {
+        "prompt": "Uzupełnij: _____ du die Antwort?",
+        "options": [
+            "Weißt",
+            "Weiß",
+            "Wissen",
+            "Wisst"
+        ],
+        "answer": 0
+    },
+    {
+        "prompt": "Uzupełnij: Er _____ alles.",
+        "options": [
+            "weißt",
+            "wissen",
+            "weiß",
+            "wisst"
+        ],
+        "answer": 2
+    },
+    {
+        "prompt": "Uzupełnij: Sie (ona) _____ den Weg.",
+        "options": [
+            "weißt",
+            "weiß",
+            "wissen",
+            "wisst"
+        ],
+        "answer": 1
+    },
+    {
+        "prompt": "Uzupełnij: Es _____ noch nichts.",
+        "options": [
+            "weiß",
+            "weißt",
+            "wissen",
+            "wisst"
+        ],
+        "answer": 0
+    },
+    {
+        "prompt": "Uzupełnij: Wir _____ die Lösung.",
+        "options": [
+            "wisst",
+            "weißen",
+            "wissen",
+            "weiß"
+        ],
+        "answer": 2
+    },
+    {
+        "prompt": "Uzupełnij: _____ ihr, wo das Buch ist?",
+        "options": [
+            "Weißt",
+            "Wisst",
+            "Wissen",
+            "Weiß"
+        ],
+        "answer": 1
+    },
+    {
+        "prompt": "Uzupełnij: Sie (oni) _____ den Termin.",
+        "options": [
+            "weißt",
+            "wisst",
+            "weiß",
+            "wissen"
+        ],
+        "answer": 3
+    },
+    {
+        "prompt": "Uzupełnij: Herr Müller, _____ Sie das?",
+        "options": [
+            "weiß",
+            "wissen",
+            "wisst",
+            "weißt"
+        ],
+        "answer": 1
+    },
+    {
+        "prompt": "Co znaczy zdanie: 'Ich weiß es nicht'?",
+        "options": [
+            "Nie mam tego.",
+            "Nie wiem tego.",
+            "Nie mówię tego.",
+            "Nie robię tego."
+        ],
+        "answer": 1
+    },
+    {
+        "prompt": "Która para ma identyczną formę czasownika wissen?",
+        "options": [
+            "du oraz er",
+            "wir oraz ihr",
+            "ich oraz er",
+            "ich oraz du"
+        ],
+        "answer": 2
+    },
+    {
+        "prompt": "Uzupełnij: Mein Freund _____ die Handynummer.",
+        "options": [
+            "wissen",
+            "weißt",
+            "weiß",
+            "wisst"
+        ],
+        "answer": 2
+    },
+    {
+        "prompt": "Uzupełnij: Anna und Tom _____ schon Bescheid.",
+        "options": [
+            "weißt",
+            "wissen",
+            "weiß",
+            "wisst"
+        ],
+        "answer": 1
+    },
+    {
+        "prompt": "Która forma czasownika jest CAŁKOWICIE BŁĘDNA?",
+        "options": [
+            "du weißt",
+            "wir wissen",
+            "ich weiß",
+            "ich wisse"
+        ],
+        "answer": 3
+    },
+    {
+        "prompt": "Uzupełnij: Du _____ immer alles besser!",
+        "options": [
+            "weißt",
+            "weiß",
+            "wisst",
+            "wissen"
+        ],
+        "answer": 0
+    },
+    {
+        "prompt": "Uzupełnij: Meine Schwester _____ nicht, wo ihre Tasche ist.",
+        "options": [
+            "wissen",
+            "weißt",
+            "wisst",
+            "weiß"
+        ],
+        "answer": 3
+    },
+    {
+        "prompt": "Uzupełnij: Wir _____ nicht, wie spät es ist.",
+        "options": [
+            "wisst",
+            "weißen",
+            "weiß",
+            "wissen"
+        ],
+        "answer": 3
+    },
+    {
+        "prompt": "Uzupełnij: _____ ihr die Telefonnummer von Paul?",
+        "options": [
+            "Weißt",
+            "Wisst",
+            "Weiß",
+            "Wissen"
+        ],
+        "answer": 1
+    },
+    {
+        "prompt": "Uzupełnij: Ich _____ genau, was du meinst.",
+        "options": [
+            "wisse",
+            "weißt",
+            "weiß",
+            "wisst"
+        ],
+        "answer": 2
+    },
+    {
+        "prompt": "Uzupełnij: Er _____ nicht, wo das Heft liegt.",
+        "options": [
+            "weiß",
+            "weißt",
+            "wissen",
+            "wisst"
+        ],
+        "answer": 0
+    },
+    {
+        "prompt": "Uzupełnij: Frau Schmidt, _____ Sie die Adresse?",
+        "options": [
+            "wisst",
+            "wissen",
+            "weißt",
+            "weiß"
+        ],
+        "answer": 1
+    },
+    {
+        "prompt": "Uzupełnij: Die Schüler _____ die Antwort.",
+        "options": [
+            "weißt",
+            "wissen",
+            "weiß",
+            "wisst"
+        ],
+        "answer": 1
+    },
+    {
+        "prompt": "Uzupełnij: _____ du, wer heute fehlt?",
+        "options": [
+            "Wissen",
+            "Weiß",
+            "Wisst",
+            "Weißt"
+        ],
+        "answer": 3
+    },
+    {
+        "prompt": "Co znaczy: 'Wir wissen alles'?",
+        "options": [
+            "Robimy wszystko.",
+            "Wiemy wszystko.",
+            "Chcemy wszystko.",
+            "Mamy wszystko."
+        ],
+        "answer": 1
+    },
+    {
+        "prompt": "Uzupełnij: Jan und ich _____ das schon.",
+        "options": [
+            "weiß",
+            "weißt",
+            "wisst",
+            "wissen"
+        ],
+        "answer": 3
+    }
+],
+  time: [
+    {
+        "prompt": "Jak powiesz po niemiecku: 'rano'?",
+        "options": [
+            "am Morgen",
+            "in der Morgen",
+            "um Morgen",
+            "im Morgen"
+        ],
+        "answer": 0
+    },
+    {
+        "prompt": "Jak powiesz po niemiecku: 'wieczorem'?",
+        "options": [
+            "im Abend",
+            "am Abend",
+            "um Abend",
+            "in der Abend"
+        ],
+        "answer": 1
+    },
+    {
+        "prompt": "Jak powiesz: 'w południe'?",
+        "options": [
+            "im Mittag",
+            "nach Mittag",
+            "am Mittag",
+            "in der Mittag"
+        ],
+        "answer": 2
+    },
+    {
+        "prompt": "Jak powiesz: 'przed południem'?",
+        "options": [
+            "im Vormittag",
+            "am Vormittag",
+            "am Mittag",
+            "am Nachmittag"
+        ],
+        "answer": 1
+    },
+    {
+        "prompt": "Jak powiesz: 'po południu'?",
+        "options": [
+            "am Vormittag",
+            "am Nachmittag",
+            "nach dem Tag",
+            "in der Nachmittag"
+        ],
+        "answer": 1
+    },
+    {
+        "prompt": "Które określenie łączy się z 'in der' zamiast 'am'?",
+        "options": [
+            "der Morgen",
+            "der Abend",
+            "die Nacht",
+            "der Mittag"
+        ],
+        "answer": 2
+    },
+    {
+        "prompt": "Jak poprawnie powiesz: 'w nocy'?",
+        "options": [
+            "um Nacht",
+            "am Nacht",
+            "im Nacht",
+            "in der Nacht"
+        ],
+        "answer": 3
+    },
+    {
+        "prompt": "Co oznacza zdanie: 'Am Morgen räume ich mein Zimmer auf'?",
+        "options": [
+            "Wieczorem sprzątam mój pokój.",
+            "W południe zmywam naczynia.",
+            "Rano ścielę łóżko.",
+            "Rano sprzątam mój pokój."
+        ],
+        "answer": 3
+    },
+    {
+        "prompt": "Co oznacza: 'Staub saugen'?",
+        "options": [
+            "myć okna",
+            "ścierać kurze",
+            "odkurzać",
+            "zmywać naczynia"
+        ],
+        "answer": 2
+    },
+    {
+        "prompt": "Co oznacza: 'den Müll rausbringen'?",
+        "options": [
+            "sprzątać pokój",
+            "segregować butelki",
+            "myć podłogę",
+            "wynosić śmieci"
+        ],
+        "answer": 3
+    },
+    {
+        "prompt": "Co oznacza: 'das Geschirr spülen'?",
+        "options": [
+            "zmywać naczynia",
+            "gotować zupę",
+            "nakrywać do stołu",
+            "robić zakupy"
+        ],
+        "answer": 0
+    },
+    {
+        "prompt": "Co oznacza: 'das Bett machen'?",
+        "options": [
+            "kupować łóżko",
+            "ścielić łóżko",
+            "naprawiać łóżko",
+            "wietrzyć pokój"
+        ],
+        "answer": 1
+    },
+    {
+        "prompt": "Uzupełnij: Am Abend bringe ich den _____ raus.",
+        "options": [
+            "Hund",
+            "Tisch",
+            "Staub",
+            "Müll"
+        ],
+        "answer": 3
+    },
+    {
+        "prompt": "Uzupełnij: Am Nachmittag gieße ich die _____.",
+        "options": [
+            "Zimmer",
+            "Blumen",
+            "Betten",
+            "Geschirr"
+        ],
+        "answer": 1
+    },
+    {
+        "prompt": "Co oznacza: 'den Tisch decken'?",
+        "options": [
+            "sprzątać ze stołu",
+            "myć stół",
+            "nakrywać do stołu",
+            "kupować stół"
+        ],
+        "answer": 2
+    },
+    {
+        "prompt": "Jaki rodzajnik mają słowa: Morgen, Mittag, Abend?",
+        "options": [
+            "der",
+            "die",
+            "das",
+            "den"
+        ],
+        "answer": 0
+    },
+    {
+        "prompt": "Co oznacza: 'das Zimmer aufräumen'?",
+        "options": [
+            "wietrzyć pokój",
+            "sprzątać pokój",
+            "zamykać pokój",
+            "malować pokój"
+        ],
+        "answer": 1
+    },
+    {
+        "prompt": "Co oznacza: 'kochen'?",
+        "options": [
+            "zmywać",
+            "sprzątać",
+            "prasować",
+            "gotować"
+        ],
+        "answer": 3
+    },
+    {
+        "prompt": "Co oznacza: 'einkaufen gehen'?",
+        "options": [
+            "iść spać",
+            "iść na zakupy",
+            "iść do szkoły",
+            "iść na spacer"
+        ],
+        "answer": 1
+    },
+    {
+        "prompt": "Uzupełnij: In _____ Nacht schlafen alle.",
+        "options": [
+            "den",
+            "der",
+            "das",
+            "dem"
+        ],
+        "answer": 1
+    },
+    {
+        "prompt": "Co oznacza: 'den Boden wischen'?",
+        "options": [
+            "myć podłogę",
+            "ścielić łóżko",
+            "zamiatać podwórko",
+            "odkurzać dywan"
+        ],
+        "answer": 0
+    },
+    {
+        "prompt": "Co oznacza: 'Fenster putzen'?",
+        "options": [
+            "zamykać okna",
+            "kupować firanki",
+            "otwierać okna",
+            "myć okna"
+        ],
+        "answer": 3
+    },
+    {
+        "prompt": "Co robisz 'am Mittag'?",
+        "options": [
+            "jem obiad / gotuję",
+            "zmywam po kolacji o 22:00",
+            "wstaję rano z łóżka",
+            "idę spać na noc"
+        ],
+        "answer": 0
+    },
+    {
+        "prompt": "Co oznacza: 'die Wäsche waschen'?",
+        "options": [
+            "prać ubrania",
+            "prasować koszule",
+            "kupować ubrania",
+            "wieszać firanki"
+        ],
+        "answer": 0
+    },
+    {
+        "prompt": "Uzupełnij: Am Morgen mache ich mein _____.",
+        "options": [
+            "Bett",
+            "Zimmer",
+            "Müll",
+            "Tisch"
+        ],
+        "answer": 0
+    }
+],
+  time_sentences: [
+    {
+        "prompt": "Co oznacza słowo: 'heute'?",
+        "options": [
+            "dzisiaj",
+            "wczoraj",
+            "pojutrze",
+            "jutro"
+        ],
+        "answer": 0
+    },
+    {
+        "prompt": "Co oznacza słowo: 'gestern'?",
+        "options": [
+            "jutro",
+            "wczoraj",
+            "przedwczoraj",
+            "dzisiaj"
+        ],
+        "answer": 1
+    },
+    {
+        "prompt": "Co oznacza słowo: 'morgen' (małą literą)?",
+        "options": [
+            "dzisiaj",
+            "rano",
+            "jutro",
+            "wczoraj"
+        ],
+        "answer": 2
+    },
+    {
+        "prompt": "Co oznacza słowo: 'vorgestern'?",
+        "options": [
+            "pojutrze",
+            "jutro",
+            "wczoraj",
+            "przedwczoraj"
+        ],
+        "answer": 3
+    },
+    {
+        "prompt": "Co oznacza słowo: 'übermorgen'?",
+        "options": [
+            "jutro",
+            "dzisiaj",
+            "przedwczoraj",
+            "pojutrze"
+        ],
+        "answer": 3
+    },
+    {
+        "prompt": "Jak naturalnie powiesz: 'jutro rano'?",
+        "options": [
+            "morgens früh",
+            "heute früh",
+            "morgen früh",
+            "morgen Morgen"
+        ],
+        "answer": 2
+    },
+    {
+        "prompt": "Jak powiesz: 'dziś rano'?",
+        "options": [
+            "morgens heute",
+            "heute Morgen",
+            "morgen früh",
+            "gestern Morgen"
+        ],
+        "answer": 1
+    },
+    {
+        "prompt": "Jak powiesz: 'dziś wieczorem'?",
+        "options": [
+            "morgen Abend",
+            "abends",
+            "gestern Abend",
+            "heute Abend"
+        ],
+        "answer": 3
+    },
+    {
+        "prompt": "Jak powiesz: 'wczoraj wieczorem'?",
+        "options": [
+            "morgen Abend",
+            "vorgestern Abend",
+            "gestern Abend",
+            "heute Abend"
+        ],
+        "answer": 2
+    },
+    {
+        "prompt": "Jak powiesz: 'pojutrze po południu'?",
+        "options": [
+            "vorgestern Nachmittag",
+            "morgen Nachmittag",
+            "gestern Nachmittag",
+            "übermorgen Nachmittag"
+        ],
+        "answer": 3
+    },
+    {
+        "prompt": "Co oznacza przysłówek: 'abends'?",
+        "options": [
+            "wieczorami / co wieczór",
+            "wczoraj wieczorem",
+            "jutro wieczorem",
+            "tylko dzisiaj wieczorem"
+        ],
+        "answer": 0
+    },
+    {
+        "prompt": "Co oznacza przysłówek: 'morgens'?",
+        "options": [
+            "dziś rano",
+            "jutro rano",
+            "przedwczoraj rano",
+            "rankami / co rano"
+        ],
+        "answer": 3
+    },
+    {
+        "prompt": "Co oznacza przysłówek: 'nachts'?",
+        "options": [
+            "jutro w nocy",
+            "tylko dziś w nocy",
+            "nocami / w nocy",
+            "wczoraj w nocy"
+        ],
+        "answer": 2
+    },
+    {
+        "prompt": "Uporządkuj chronologicznie: 'wczoraj -> dzisiaj -> jutro'",
+        "options": [
+            "morgen, heute, gestern",
+            "vorgestern, heute, morgen",
+            "heute, gestern, morgen",
+            "gestern, heute, morgen"
+        ],
+        "answer": 3
+    },
+    {
+        "prompt": "Uporządkuj chronologicznie: 'dzisiaj -> jutro -> pojutrze'",
+        "options": [
+            "heute, übermorgen, morgen",
+            "gestern, heute, morgen",
+            "heute, morgen, übermorgen",
+            "morgen, heute, übermorgen"
+        ],
+        "answer": 2
+    },
+    {
+        "prompt": "Przetłumacz: 'Przedwczoraj byłem w domu'.",
+        "options": [
+            "Vorgestern war ich zu Hause.",
+            "Heute bin ich zu Hause.",
+            "Gestern war ich zu Hause.",
+            "Übermorgen bin ich zu Hause."
+        ],
+        "answer": 0
+    },
+    {
+        "prompt": "Jak powiesz: 'przedwczoraj rano'?",
+        "options": [
+            "morgen früh",
+            "gestern Morgen",
+            "vorgestern Morgen",
+            "übermorgen Morgen"
+        ],
+        "answer": 2
+    },
+    {
+        "prompt": "Jak powiesz: 'jutro po południu'?",
+        "options": [
+            "morgen Nachmittag",
+            "vorgestern Nachmittag",
+            "gestern Nachmittag",
+            "heute Nachmittag"
+        ],
+        "answer": 0
+    },
+    {
+        "prompt": "Co oznacza przysłówek: 'mittags'?",
+        "options": [
+            "w nocy",
+            "w południa / co południe",
+            "wieczorem",
+            "rano"
+        ],
+        "answer": 1
+    },
+    {
+        "prompt": "Przetłumacz: 'Dziś po południu gram w piłkę'.",
+        "options": [
+            "Gestern Nachmittag spiele ich Fußball.",
+            "Vorgestern Abend spiele ich Fußball.",
+            "Morgen früh spiele ich Fußball.",
+            "Heute Nachmittag spiele ich Fußball."
+        ],
+        "answer": 3
+    },
+    {
+        "prompt": "Przetłumacz: 'Jutro wieczorem idę do kina'.",
+        "options": [
+            "Gestern Abend gehe ich ins Kino.",
+            "Heute Morgen gehe ich ins Kino.",
+            "Morgen Abend gehe ich ins Kino.",
+            "Vorgestern gehe ich ins Kino."
+        ],
+        "answer": 2
+    },
+    {
+        "prompt": "Jak powiesz: 'wczoraj przed południem'?",
+        "options": [
+            "heute Vormittag",
+            "gestern Vormittag",
+            "übermorgen Vormittag",
+            "morgen Vormittag"
+        ],
+        "answer": 1
+    },
+    {
+        "prompt": "Co oznacza przysłówek: 'nachmittags'?",
+        "options": [
+            "rankami",
+            "popołudniami",
+            "w południe",
+            "w nocy"
+        ],
+        "answer": 1
+    },
+    {
+        "prompt": "Uzupełnij: _____ (pojutrze) habe ich keine Schule.",
+        "options": [
+            "Übermorgen",
+            "Vorgestern",
+            "Gestern",
+            "Nachts"
+        ],
+        "answer": 0
+    },
+    {
+        "prompt": "Przetłumacz: 'Wczoraj sprzątałem mój pokój'.",
+        "options": [
+            "Morgen räume ich mein Zimmer auf.",
+            "Übermorgen koche ich.",
+            "Heute Abend schlafe ich.",
+            "Gestern habe ich mein Zimmer aufgeräumt."
+        ],
+        "answer": 3
+    }
+]
+};
+
+let userStats = {
+  elo: parseInt(localStorage.getItem("german_trainer_elo") || "1000", 10),
+  streak: parseInt(localStorage.getItem("german_trainer_streak") || "0", 10),
+  lastDate: localStorage.getItem("german_trainer_last_date") || "",
+  totalAnswers: parseInt(localStorage.getItem("german_trainer_answers") || "0", 10)
+};
+
+function getRankName(elo) {
+  if (elo < 1050) return "Brąz I";
+  if (elo < 1100) return "Brąz II";
+  if (elo < 1200) return "Srebro I";
+  if (elo < 1300) return "Srebro II";
+  if (elo < 1450) return "Złoto I";
+  return "Mistrz Niemieckiego 👑";
+}
+
+function updateTopBarUI() {
+  document.getElementById("nav-streak").textContent = userStats.streak;
+  document.getElementById("nav-elo").textContent = userStats.elo;
+  document.getElementById("nav-rank-badge").textContent = getRankName(userStats.elo);
+
+  document.getElementById("stat-elo-val").textContent = userStats.elo;
+  document.getElementById("stat-rank-val").textContent = getRankName(userStats.elo);
+  document.getElementById("stat-streak-val").textContent = userStats.streak;
+  document.getElementById("stat-total-answers").textContent = userStats.totalAnswers;
+}
+
+function checkDailyStreak() {
+  const today = new Date().toISOString().split("T")[0];
+  if (!userStats.lastDate) {
+    userStats.streak = 1;
+    userStats.lastDate = today;
+  } else if (userStats.lastDate !== today) {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yStr = yesterday.toISOString().split("T")[0];
+    if (userStats.lastDate === yStr) {
+      userStats.streak += 1;
+    } else {
+      userStats.streak = 1;
+    }
+    userStats.lastDate = today;
+  }
+  localStorage.setItem("german_trainer_streak", userStats.streak);
+  localStorage.setItem("german_trainer_last_date", userStats.lastDate);
+  updateTopBarUI();
+}
+
+function calculateEloGain(correct, total, totalSeconds) {
+  const accuracy = correct / total;
+  const avgTimePerQuestion = totalSeconds / total;
+  
+  let delta = Math.round((accuracy - 0.5) * 40);
+
+  if (accuracy >= 0.7) {
+    if (avgTimePerQuestion < 3.5) delta += 10;
+    else if (avgTimePerQuestion < 5.5) delta += 5;
+  }
+
+  if (delta < -25) delta = -25;
+  if (delta > 35) delta = 35;
+
+  userStats.elo = Math.max(500, userStats.elo + delta);
+  userStats.totalAnswers += total;
+  localStorage.setItem("german_trainer_elo", userStats.elo);
+  localStorage.setItem("german_trainer_answers", userStats.totalAnswers);
+  updateTopBarUI();
+  return delta;
+}
+
+let currentFlow = "quiz";
+let activeQuestions = [];
+let currentQIndex = 0;
+let hearts = 3;
+let correctAnswersCount = 0;
+let questionTimer = null;
+let questionSeconds = 0;
+let totalQuizSeconds = 0;
+let selectedOption = null;
+let isAnswerChecked = false;
+let currentTopicKey = "wissen";
+
+let config = {
+  darkMode: false
+};
+
+function switchTab(tabId) {
+  document.querySelectorAll(".nav-tab-btn").forEach(b => b.classList.remove("active"));
+  
+  document.getElementById("view-game").style.display = "none";
+  document.getElementById("view-topic-picker").style.display = "none";
+  document.getElementById("view-study").style.display = "none";
+  document.getElementById("view-quiz").style.display = "none";
+  document.getElementById("view-end").style.display = "none";
+  document.getElementById("view-stats").style.display = "none";
+
+  if (tabId === "game") {
+    document.getElementById("tab-game").classList.add("active");
+    document.getElementById("view-game").style.display = "flex";
+  } else if (tabId === "knowledge") {
+    document.getElementById("tab-knowledge").classList.add("active");
+    openCategorySelector("study");
+  } else if (tabId === "stats") {
+    document.getElementById("tab-stats").classList.add("active");
+    document.getElementById("view-stats").style.display = "flex";
+  }
+}
+
+function openCategorySelector(mode) {
+  currentFlow = mode;
+  document.getElementById("view-game").style.display = "none";
+  document.getElementById("view-study").style.display = "none";
+  document.getElementById("view-quiz").style.display = "none";
+  document.getElementById("view-end").style.display = "none";
+  document.getElementById("view-topic-picker").style.display = "flex";
+
+  const title = document.getElementById("picker-title");
+  const sub = document.getElementById("picker-subtitle");
+  if (mode === "study") {
+    title.textContent = "📖 Nauka i Fiszki: Wybierz temat";
+    sub.textContent = "Wybierz dział, aby spokojnie przeczytać teorię i przykłady.";
+  } else {
+    title.textContent = "🎯 Ćwiczenia (25 pytań): Wybierz temat";
+    sub.textContent = "Sprawdź się w wybranym dziale i podbijaj ELO.";
+  }
+}
+
+function selectTopicAndProceed(topicKey) {
+  currentTopicKey = topicKey;
+  if (currentFlow === "study") {
+    showStudyScreen(topicKey);
+  } else {
+    startQuiz(topicKey, false);
+  }
+}
+
+function showStudyScreen(topicKey) {
+  document.getElementById("view-topic-picker").style.display = "none";
+  document.getElementById("view-study").style.display = "flex";
+
+  const data = studyDatabases[topicKey];
+  document.getElementById("study-tag").textContent = data.title;
+  document.getElementById("study-content").innerHTML = data.html;
+
+  document.getElementById("study-to-quiz-btn").onclick = () => {
+    startQuiz(topicKey, false);
+  };
+}
+
+function startBossTest() {
+  currentTopicKey = "boss";
+  startQuiz("boss", true);
+}
+
+function startQuiz(topicKey, isBoss) {
+  document.getElementById("view-game").style.display = "none";
+  document.getElementById("view-topic-picker").style.display = "none";
+  document.getElementById("view-study").style.display = "none";
+  document.getElementById("view-end").style.display = "none";
+  document.getElementById("view-quiz").style.display = "flex";
+
+  hearts = isBoss ? 5 : 3;
+  document.getElementById("hearts-count").textContent = hearts;
+  currentQIndex = 0;
+  correctAnswersCount = 0;
+  totalQuizSeconds = 0;
+
+  if (isBoss) {
+    activeQuestions = [
+      ...questionDatabases.wissen,
+      ...questionDatabases.time,
+      ...questionDatabases.time_sentences
+    ];
+  } else {
+    activeQuestions = [...questionDatabases[topicKey]];
+  }
+
+  for (let i = activeQuestions.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [activeQuestions[i], activeQuestions[j]] = [activeQuestions[j], activeQuestions[i]];
+  }
+
+  loadQuestion();
+}
+
+function loadQuestion() {
+  clearInterval(questionTimer);
+  questionSeconds = 0;
+  document.getElementById("question-time").textContent = questionSeconds;
+
+  questionTimer = setInterval(() => {
+    questionSeconds++;
+    totalQuizSeconds++;
+    document.getElementById("question-time").textContent = questionSeconds;
+  }, 1000);
+
+  const q = activeQuestions[currentQIndex];
+  document.getElementById("quiz-category-tag").textContent = 
+    `${currentTopicKey === 'boss' ? '👑 BOSS TEST' : 'ZADANIE'} (${currentQIndex + 1}/${activeQuestions.length})`;
+  document.getElementById("prompt-text").textContent = q.prompt;
+
+  const container = document.getElementById("options-container");
+  container.innerHTML = "";
+  selectedOption = null;
+  isAnswerChecked = false;
+  
+  const submitBtn = document.getElementById("submit-btn");
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Sprawdź";
+  
+  const feedback = document.getElementById("feedback");
+  feedback.className = "feedback-box";
+  feedback.textContent = "";
+
+  q.options.forEach((opt, idx) => {
+    const btn = document.createElement("button");
+    btn.className = "option-btn";
+    btn.textContent = opt;
+    btn.onclick = () => selectOption(idx, btn);
+    container.appendChild(btn);
+  });
+}
+
+function selectOption(index, btnElement) {
+  if (isAnswerChecked) return;
+  const buttons = document.querySelectorAll(".option-btn");
+  buttons.forEach(b => b.classList.remove("selected"));
+
+  btnElement.classList.add("selected");
+  selectedOption = index;
+  document.getElementById("submit-btn").disabled = false;
+}
+
+document.getElementById("submit-btn").addEventListener("click", () => {
+  if (!isAnswerChecked) {
+    checkAnswer();
+  } else {
+    nextQuestion();
+  }
+});
+
+function checkAnswer() {
+  isAnswerChecked = true;
+  clearInterval(questionTimer);
+
+  const q = activeQuestions[currentQIndex];
+  const buttons = document.querySelectorAll(".option-btn");
+  buttons.forEach(b => b.disabled = true);
+
+  const feedback = document.getElementById("feedback");
+
+  if (selectedOption === q.answer) {
+    correctAnswersCount++;
+    buttons[selectedOption].classList.remove("selected");
+    buttons[selectedOption].classList.add("correct");
+    feedback.className = "feedback-box correct";
+    feedback.textContent = "Dobrze! Znakomita robota.";
+  } else {
+    buttons[selectedOption].classList.remove("selected");
+    buttons[selectedOption].classList.add("wrong");
+    buttons[q.answer].classList.add("correct");
+    feedback.className = "feedback-box wrong";
+    feedback.textContent = `Prawidłowa odpowiedź: ${q.options[q.answer]}`;
+
+    hearts--;
+    document.getElementById("hearts-count").textContent = hearts;
+    if (hearts <= 0) {
+      endQuiz(false);
+      return;
+    }
+  }
+
+  document.getElementById("submit-btn").textContent = "Dalej";
+}
+
+function nextQuestion() {
+  currentQIndex++;
+  if (currentQIndex >= activeQuestions.length) {
+    endQuiz(true);
+  } else {
+    loadQuestion();
+  }
+}
+
+function endQuiz(completed) {
+  clearInterval(questionTimer);
+  document.getElementById("view-quiz").style.display = "none";
+  document.getElementById("view-end").style.display = "flex";
+
+  const total = activeQuestions.length;
+  const percent = Math.round((correctAnswersCount / total) * 100);
+  document.getElementById("end-percent").textContent = `${percent}%`;
+
+  const eloChange = calculateEloGain(correctAnswersCount, total, totalQuizSeconds);
+  const eloDiffEl = document.getElementById("end-elo-diff");
+  eloDiffEl.textContent = eloChange >= 0 ? `+${eloChange} ELO` : `${eloChange} ELO`;
+  eloDiffEl.style.color = eloChange >= 0 ? "var(--primary)" : "var(--error)";
+
+  const title = document.getElementById("end-title");
+  const sub = document.getElementById("end-subtitle");
+
+  if (completed) {
+    title.textContent = currentTopicKey === "boss" ? "👑 BOSS POKONANY!" : "Quest ukończony!";
+    sub.textContent = `Poprawne: ${correctAnswersCount}/${total} w czasie ${totalQuizSeconds}s.`;
+    checkDailyStreak();
+  } else {
+    title.textContent = "Koniec gry (Brak serc)";
+    sub.textContent = `Udało się rozwiązać ${correctAnswersCount}/${total} pytań przed utratą żyć.`;
+  }
+}
+
+function restartCurrentQuiz() {
+  if (currentTopicKey === "boss") startBossTest();
+  else startQuiz(currentTopicKey, false);
+}
+
+const settingsModal = document.getElementById("settings-modal");
+document.getElementById("settings-open-btn").addEventListener("click", () => {
+  document.getElementById("setting-darkmode").checked = config.darkMode;
+  settingsModal.style.display = "flex";
+});
+
+document.getElementById("settings-close-btn").addEventListener("click", () => {
+  settingsModal.style.display = "none";
+});
+
+document.getElementById("setting-darkmode").addEventListener("change", (e) => {
+  if (e.target.checked) document.body.classList.add("dark-mode");
+  else document.body.classList.remove("dark-mode");
+});
+
+document.getElementById("settings-save-btn").addEventListener("click", () => {
+  config.darkMode = document.getElementById("setting-darkmode").checked;
+  settingsModal.style.display = "none";
+});
+
+updateTopBarUI();
+</script>
+</body>
+</html>
